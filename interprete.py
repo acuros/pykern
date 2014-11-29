@@ -1,5 +1,4 @@
+import gc
 while True:
-    namespaces = {}
-    with open(raw_input('filename > ')) as f:
-        code = compile(f.read(), '<string>', 'exec')
-        exec code in namespaces
+    execfile(raw_input('filename > '), {})
+    gc.collect()
