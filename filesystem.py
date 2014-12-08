@@ -1,3 +1,4 @@
+import os
 import bson
 
 from collections import OrderedDict
@@ -23,20 +24,26 @@ class FStringIO(StringIO):
 
 @singleton
 class FileSystem(object):
-    def __init__(self, fs_file_name='pykern.fs'):
+    def __init__(self, fs_file_name=None):
+        self.fs_file_name = fs_file_name or os.getenv('PYKERN_FS_FILENAME') or 'pykern.fs'
         try:
-            self.fs_file = open(fs_file_name, 'r+')
+            self.fs_file = open(self.fs_file_name, 'r+')
         except IOError:
-            with open(fs_file_name, 'w') as f:
+            with open(self.fs_file_name, 'w') as f:
                 f.write('\x00'*1024*1024)
                 f.seek(0)
                 f.write(bson.dumps(dict(metadata=[])))
-            self.fs_file = open(fs_file_name, 'r+')
+            self.fs_file = open(self.fs_file_name, 'r+')
         self.metadata = self._load_metadata()
         self.opened_files = dict()
 
     def _load_metadata(self):
-        metadata = bson.loads(self.fs_file.read(1024*1024))['metadata']
+        try:
+            raw_data = self.fs_file.read(1024*1024)
+            metadata = bson.loads(raw_data)['metadata']
+        except Exception, e:
+            print 'raw data:', repr(raw_data)
+            raise e
         return OrderedDict(metadata)
 
     def open_file(self, filename, mode='r'):
@@ -81,7 +88,7 @@ class FileSystem(object):
         self.fs_file.flush()
 
     def _move_fs_cursor_to(self, filename):
-        start_pos = 0
+        start_pos = 1024*1024
         for _filename, _metadata in self.metadata.items():
             if _filename == filename:
                 break

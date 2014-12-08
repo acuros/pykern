@@ -2,11 +2,10 @@ import gc
 
 
 class Shell(object):
-    def __init__(self):
-        pass
+    def __init__(self, kernel):
+        self.kernel = kernel
 
-    @staticmethod
-    def run():
+    def run(self):
         while True:
-            execfile(raw_input('Input filename > '), {})
+            self.kernel.run_file(raw_input('Input filename > '))
             gc.collect()
