@@ -10,7 +10,10 @@ class Kernel(object):
 
     @property
     def namespace(self):
-        return {'open': self.filesystem.open_file}
+        return {
+            'open': self.filesystem.open_file,
+            'file': self.filesystem.open_file
+        }
 
     def run_file(self, filename):
         execfile(filename, self.namespace)
