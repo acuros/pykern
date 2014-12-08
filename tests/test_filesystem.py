@@ -1,10 +1,17 @@
+import bson
 from filesystem import FileSystem
-import os
 
 
 def test_file_write():
     fs = FileSystem('test.file.txt')
-    f = fs.open_file('file.txt', 'w')
-    f.write('1234')
-    f.close()
-    assert os.path.getsize('test.file.txt') > 0
+    with fs.open_file('file.txt', 'w') as f:
+        f.write('1234')
+
+    with open('test.file.txt', 'r') as f:
+        data = f.read()
+    assert len(data) > 0
+
+    assert data[1024*1024:] == '1234'
+
+    metadata = bson.loads(data)['metadata']
+    assert metadata['file.txt']['file_size'] == 4

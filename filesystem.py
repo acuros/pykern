@@ -1,3 +1,5 @@
+import bson
+
 from collections import OrderedDict
 from StringIO import StringIO
 from utils import singleton
@@ -7,6 +9,12 @@ class FStringIO(StringIO):
     def __init__(self, filename, data=''):
         self.filename = filename
         StringIO.__init__(self, data)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *arg):
+        self.close()
 
     def close(self):
         FileSystem().close_file(self)
@@ -19,20 +27,25 @@ class FileSystem(object):
         try:
             self.fs_file = open(fs_file_name, 'r+')
         except IOError:
-            open(fs_file_name, 'w').close()
+            with open(fs_file_name, 'w') as f:
+                f.write('\x00'*1024*1024)
+                f.seek(0)
+                f.write(bson.dumps(dict(metadata=[])))
             self.fs_file = open(fs_file_name, 'r+')
         self.metadata = self._load_metadata()
         self.opened_files = dict()
 
     def _load_metadata(self):
-        line = self.fs_file.readline().strip()
-        return OrderedDict(line)
+        metadata = bson.loads(self.fs_file.read(1024*1024))['metadata']
+        return OrderedDict(metadata)
 
     def open_file(self, filename, mode='r'):
         if mode == 'r':
             fp = self._open_file_for_read(filename)
         elif mode == 'w':
             fp = self._open_file_for_write(filename)
+        else:
+            raise AttributeError('Mode have to be set "r" or "w"')
         self.opened_files[filename] = mode
         return fp
 
@@ -60,23 +73,11 @@ class FileSystem(object):
         if mode == 'w' and 'is_new' in self.metadata[vfile.filename]:
             self.fs_file.seek(0, 2)
             vfile.seek(0)
-            self.fs_file.write(vfile.read())
-            self.fs_file.flush()
-            return
-        gap = vfile.len - self.metadata[vfile.filename]['file_size']
-        print gap
-        if gap == 0:
-            return
-        metadata = self.metadata.items()
-        if gap < 0:
-            metadata.reverse()
-        for filename, metadata in metadata:
-            data = self.read_file(filename)
-            self._move_fs_cursor_to(filename)
-            self.fs_file.seek(gap, 1)
+            data = vfile.read()
             self.fs_file.write(data)
-            if filename == vfile.filename:
-                break
+            self.metadata[vfile.filename]['file_size'] = len(data)
+            del self.metadata[vfile.filename]['is_new']
+            self.save_metadata()
         self.fs_file.flush()
 
     def _move_fs_cursor_to(self, filename):
@@ -87,5 +88,10 @@ class FileSystem(object):
             start_pos += _metadata['file_size']
         self.fs_file.seek(start_pos)
 
-    def empty_metadata(self):
+    def save_metadata(self):
+        self.fs_file.seek(0)
+        self.fs_file.write(bson.dumps(dict(metadata=self.metadata)))
+
+    @staticmethod
+    def empty_metadata():
         return dict(file_size=0)
