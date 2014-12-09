@@ -1,8 +1,8 @@
-import os
 import bson
-
+import os
 from collections import OrderedDict
 from StringIO import StringIO
+
 from utils import singleton
 
 

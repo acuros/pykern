@@ -1,4 +1,5 @@
 from filesystem import FileSystem
+from libs import os
 from shell import Shell
 from utils import singleton
 
@@ -12,7 +13,8 @@ class Kernel(object):
     def namespace(self):
         return {
             'open': self.filesystem.open_file,
-            'file': self.filesystem.open_file
+            'file': self.filesystem.open_file,
+            'os': os
         }
 
     def run_file(self, filename):

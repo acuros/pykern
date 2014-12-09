@@ -1,7 +1,7 @@
-import os
 import bson
+
 from filesystem import FileSystem
-from kernel import Kernel
+from tests.utils import run_file_in_kernel
 
 
 def test_filesystem_file_write():
@@ -19,7 +19,5 @@ def test_filesystem_file_write():
     assert metadata['file.txt']['file_size'] == 4
 
 
-def test_kernel_file_write():
-    dirname = os.path.dirname(os.path.realpath(__file__))
-    kernel = Kernel()
-    kernel.run_file(os.path.join(dirname, 'file_write_test_in_kernel.py'))
+def test_filesystem_in_kernel():
+    assert run_file_in_kernel('file_write.py')

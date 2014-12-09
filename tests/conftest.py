@@ -1,5 +1,6 @@
-import os
 from _pytest.monkeypatch import monkeypatch
+
+import os
 
 
 def pytest_configure():
