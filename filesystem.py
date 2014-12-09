@@ -38,12 +38,8 @@ class FileSystem(object):
         self.opened_files = dict()
 
     def _load_metadata(self):
-        try:
-            raw_data = self.fs_file.read(1024*1024)
-            metadata = bson.loads(raw_data)['metadata']
-        except Exception, e:
-            print 'raw data:', repr(raw_data)
-            raise e
+        raw_data = self.fs_file.read(1024*1024)
+        metadata = bson.loads(raw_data)['metadata']
         return OrderedDict(metadata)
 
     def open_file(self, filename, mode='r'):
