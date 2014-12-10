@@ -1,3 +1,4 @@
+import sys
 from filesystem import FileSystem
 from libs import os
 from shell import Shell
@@ -14,11 +15,15 @@ class Kernel(object):
         return {
             'open': self.filesystem.open_file,
             'file': self.filesystem.open_file,
-            'os': os
         }
 
     def run_file(self, filename):
-        execfile(filename, self.namespace)
+        original_modules = sys.modules.copy()
+        sys.modules['os'] = os
+        try:
+            execfile(filename, self.namespace)
+        finally:
+            sys.modules = original_modules
 
 if __name__ == '__main__':
     kernel = Kernel()
