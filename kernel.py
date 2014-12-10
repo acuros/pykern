@@ -8,12 +8,12 @@ from shell import Shell
 class Kernel(object):
     def __init__(self):
         self.filesystem = FileSystem()
-        self.virtualize()
+        self.subtitue_libs()
 
     def boot(self):
         Shell(self).run()
 
-    def virtualize(self):
+    def subtitue_libs(self):
         new_modules = dict((name, getattr(libs, name)) for name in libs.__all__)
         sys.modules.update(new_modules)
         self.filesystem.patch_all()
