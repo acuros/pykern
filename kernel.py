@@ -18,7 +18,7 @@ class Kernel(object):
             'file': self.filesystem.open_file,
         }
 
-    def run_file(self, filename):
+    def run_external_file(self, filename):
         original_modules = sys.modules.copy()
         new_modules = dict((name, getattr(libs, name)) for name in libs.__all__)
         sys.modules.update(new_modules)

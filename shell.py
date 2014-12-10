@@ -7,5 +7,5 @@ class Shell(object):
 
     def run(self):
         while True:
-            self.kernel.run_file(raw_input('Input filename > '))
+            self.kernel.run_external_file(raw_input('Input filename > '))
             gc.collect()
