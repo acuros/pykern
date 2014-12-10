@@ -7,5 +7,10 @@ class Shell(object):
 
     def run(self):
         while True:
-            self.kernel.run_external_file(raw_input('Input filename > '))
-            gc.collect()
+            filename = raw_input('Input filename > ')
+            try:
+                self.kernel.run_file(filename)
+            except IOError:
+                print 'File "%s" not found' % filename
+            else:
+                gc.collect()

@@ -11,24 +11,25 @@ class Kernel(object):
         self.virtualize()
 
     def boot(self):
-        self.virtualize()
+        Shell(self).run()
 
     def virtualize(self):
         new_modules = dict((name, getattr(libs, name)) for name in libs.__all__)
         sys.modules.update(new_modules)
         self.filesystem.patch_all()
 
+    def run_file(self, filename):
+        with open(filename) as f:
+            return self.run_code(f.read())
+
     def run_code(self, code):
-        code = compile(code, '<string>', 'exec')
-        original_modules = sys.modules.copy()
-        new_modules = dict((name, getattr(libs, name)) for name in libs.__all__)
-        sys.modules.update(new_modules)
         try:
-            exec code in dict()
-        finally:
-            sys.modules = original_modules
+            exec compile(code, '<string>', 'exec') in dict()
+        except:
+            return 1
+        else:
+            return 0
 
 
 if __name__ == '__main__':
-    kernel = Kernel()
-    Shell(kernel).run()
+    Kernel().boot()
