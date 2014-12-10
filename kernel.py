@@ -1,6 +1,7 @@
 import sys
+
+import libs
 from filesystem import FileSystem
-from libs import os
 from shell import Shell
 from utils import singleton
 
@@ -19,7 +20,8 @@ class Kernel(object):
 
     def run_file(self, filename):
         original_modules = sys.modules.copy()
-        sys.modules['os'] = os
+        new_modules = dict((name, getattr(libs, name)) for name in libs.__all__)
+        sys.modules.update(new_modules)
         try:
             execfile(filename, self.namespace)
         finally:
