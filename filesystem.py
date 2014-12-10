@@ -98,3 +98,8 @@ class FileSystem(object):
     @staticmethod
     def empty_metadata():
         return dict(file_size=0)
+
+    def patch_all(self):
+        import __builtin__
+        __builtin__.open = __builtin__.file = self.open_file
+
