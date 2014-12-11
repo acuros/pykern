@@ -1,8 +1,8 @@
 import sys
 
-import libs
 from filesystem import FileSystem
-from shell import Shell
+from pykern import libs
+from pykern.shell import Shell
 
 
 class Kernel(object):

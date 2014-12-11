@@ -1,6 +1,8 @@
+import glob
 import os
 import sys
-from filesystem import FileSystem
+
+from pykern.filesystem import FileSystem
 from kernel import Kernel
 
 
@@ -20,7 +22,7 @@ class Emulator(object):
         fs = FileSystem(fs_file_name)
         if not fs.is_created:
             raise ValueError('Already installed')
-        defaults = os.listdir('defaults')
+        defaults = glob.glob(os.path.realpath(__file__)+'*.py')
         for filename in defaults:
             self.put_file(os.path.join('defaults', filename), fs_file_name)
 

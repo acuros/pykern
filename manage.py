@@ -1,5 +1,7 @@
 import sys
-from emulator import Emulator
+
+from pykern.emulator import Emulator
+
 
 if len(sys.argv) < 2:
     print 'Command required'

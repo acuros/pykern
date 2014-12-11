@@ -1,6 +1,7 @@
 import os
 import traceback
-from emulator import Emulator
+
+from pykern.emulator import Emulator
 
 
 def run_file_in_kernel(filename):

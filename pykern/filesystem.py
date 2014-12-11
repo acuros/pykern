@@ -1,9 +1,10 @@
-import bson
 import os
 from collections import OrderedDict
 from StringIO import StringIO
 
-from utils import singleton
+import bson
+
+from pykern.utils import singleton
 
 
 class FStringIO(StringIO):

@@ -1,6 +1,6 @@
 import bson
 
-from filesystem import FileSystem
+from pykern.filesystem import FileSystem
 from tests.utils import run_file_in_kernel
 
 
