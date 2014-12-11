@@ -12,6 +12,8 @@ class Shell(object):
             except EOFError:
                 print
                 break
+            if not filename:
+                continue
             try:
                 self.kernel.run_file(filename)
             except IOError:
