@@ -26,6 +26,6 @@ class Kernel(object):
         try:
             exec compile(code, '<string>', 'exec') in dict()
         except:
-            return 1
+            return False
         else:
-            return 0
+            return True
