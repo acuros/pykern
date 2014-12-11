@@ -1,3 +1,6 @@
+import readline
+import traceback
+
 print 'Pykern Python Interpreter v0.1'
 lines = []
 while True:
@@ -15,6 +18,9 @@ while True:
     lines.append(line)
     if len(lines) == 1 and not lines[-1].endswith(':') or lines[-1] == '':
         code = '\n'.join(lines)
-        exec compile(code, '<string>', 'exec') in dict()
-        lines = []
+        try:
+            exec compile(code, '<string>', 'exec')
+        except Exception, e:
+            traceback.print_exc()
 
+        lines = []
