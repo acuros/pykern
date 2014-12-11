@@ -29,7 +29,7 @@ class Emulator(object):
 
     def put_file(self, filepath, fs_file_name=None):
         with open(filepath, 'rb') as rf:
-            filename = os.path.split(filepath)[1]
+            filename = '.'.join(os.path.split(filepath)[1].split('.')[:-1])
             with FileSystem(fs_file_name).open_file(filename, 'w') as vf:
                 while True:
                     data = rf.read(10240)
