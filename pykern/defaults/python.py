@@ -1,7 +1,7 @@
 import readline
 import traceback
 
-print 'Pykern Python Interpreter v0.1'
+print 'Pykern Python Interpreter v0.2'
 lines = []
 while True:
     indicator_str = '>>> ' if not lines else '...'
@@ -19,7 +19,10 @@ while True:
     if len(lines) == 1 and not lines[-1].endswith(':') or lines[-1] == '':
         code = '\n'.join(lines)
         try:
-            exec compile(code, '<string>', 'exec')
+            try:
+                print eval(code)
+            except SyntaxError:
+                exec compile(code, '<string>', 'exec')
         except Exception, e:
             traceback.print_exc()
 
