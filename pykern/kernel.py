@@ -6,8 +6,8 @@ from pykern.shell import Shell
 
 
 class Kernel(object):
-    def __init__(self):
-        self.filesystem = FileSystem()
+    def __init__(self, fs_file_name=None):
+        self.filesystem = FileSystem(fs_file_name)
         self.subtitue_libs()
 
     def boot(self):
@@ -29,7 +29,3 @@ class Kernel(object):
             return 1
         else:
             return 0
-
-
-if __name__ == '__main__':
-    Kernel().boot()

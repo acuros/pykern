@@ -7,7 +7,11 @@ class Shell(object):
 
     def run(self):
         while True:
-            filename = raw_input('Input filename > ')
+            try:
+                filename = raw_input('$ ')
+            except EOFError:
+                print
+                break
             try:
                 self.kernel.run_file(filename)
             except IOError:

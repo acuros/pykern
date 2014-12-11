@@ -22,12 +22,14 @@ class Emulator(object):
         fs = FileSystem(fs_file_name)
         if not fs.is_created:
             raise ValueError('Already installed')
-        defaults = glob.glob(os.path.realpath(__file__)+'*.py')
-        for filename in defaults:
-            self.put_file(os.path.join('defaults', filename), fs_file_name)
+        defaults_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'defaults')
+        defaults = glob.glob(os.path.join(defaults_dir, '*.py'))
+        for filepath in defaults:
+            self.put_file(filepath, fs_file_name)
 
-    def put_file(self, filename, fs_file_name=None):
-        with open(filename, 'rb') as rf:
+    def put_file(self, filepath, fs_file_name=None):
+        with open(filepath, 'rb') as rf:
+            filename = os.path.split(filepath)[1]
             with FileSystem(fs_file_name).open_file(filename, 'w') as vf:
                 while True:
                     data = rf.read(10240)
