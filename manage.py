@@ -14,9 +14,14 @@ emulator = Emulator()
 
 if command == 'install':
     fs_file_name = None
+    force = False
+
     if len(sys.argv) >= 3:
         fs_file_name = sys.argv[2]
-    emulator.install(fs_file_name)
+    if len(sys.argv) >= 4 and sys.argv[3] == '-f':
+        force = True
+
+    emulator.install(fs_file_name, force)
 elif command == 'run':
     fs_file_name = None
     if len(sys.argv) >= 3:
