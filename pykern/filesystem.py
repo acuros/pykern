@@ -44,9 +44,9 @@ class FileSystem(object):
         return OrderedDict(metadata)
 
     def open_file(self, filename, mode='r'):
-        if mode == 'r':
+        if mode.startswith('r'):
             fp = self._open_file_for_read(filename)
-        elif mode == 'w':
+        elif mode.startswith('w'):
             fp = self._open_file_for_write(filename)
         else:
             raise AttributeError('Mode have to be set "r" or "w"')

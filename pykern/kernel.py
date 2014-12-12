@@ -14,7 +14,7 @@ class Kernel(object):
         Shell(self).run()
 
     def subtitue_libs(self):
-        new_modules = dict((name, getattr(libs, name)) for name in libs.__all__)
+        new_modules = dict((name.split('pykern_')[1], getattr(libs, name)) for name in libs.__all__)
         sys.modules.update(new_modules)
         self.filesystem.patch_all()
 

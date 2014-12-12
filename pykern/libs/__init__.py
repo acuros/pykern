@@ -1,3 +1,3 @@
-from . import os
+from . import pykern_os
 
-__all__ = ['os']
+__all__ = ['pykern_os']
