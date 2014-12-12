@@ -88,6 +88,13 @@ class FileSystem(object):
             self.save_metadata()
         self.fs_file.flush()
 
+    def mkdir(self, dirname):
+        if dirname in self.metadata or dirname in ('.', '..'):
+            raise IOError('File exists')
+        if '/' in dirname:
+            raise ValueError('"/" is not permitted in directory name')
+        self.metadata[dirname] = dict(file_size=0, is_directory=True)
+
     def _move_fs_cursor_to(self, filename):
         start_pos = 1024*1024
         for _filename, _metadata in self.metadata.items():
