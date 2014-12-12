@@ -1,14 +1,14 @@
 import readline
 import traceback
 
-print 'Pykern Python Interpreter v0.2'
-
 
 def line_not_finished(line):
     return not line.endswith(':')
 
 
 def main():
+    print 'Pykern Python Interpreter v0.2'
+
     lines = []
     while True:
         indicator_str = '>>> ' if not lines else '... '
