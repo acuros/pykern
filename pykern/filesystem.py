@@ -29,9 +29,7 @@ class FileSystem(object):
         self.fs_file_name = fs_file_name or os.getenv('PYKERN_FS_FILENAME') or 'pykern.fs'
         try:
             self.fs_file = open(self.fs_file_name, 'r+')
-            self.is_created = False
         except IOError:
-            self.is_created = True
             with open(self.fs_file_name, 'w') as f:
                 f.write('\x00'*1024*1024)
                 f.seek(0)

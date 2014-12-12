@@ -20,12 +20,12 @@ class Emulator(object):
         return is_success
 
     def install(self, fs_file_name=None, force=False):
-        fs = FileSystem(fs_file_name)
-        if not fs.is_created:
+        if os.path.exists(fs_file_name):
             if not force:
                 raise ValueError('Already installed')
             else:
                 os.remove(fs_file_name)
+        FileSystem(fs_file_name)
         defaults_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'defaults')
         defaults = glob.glob(os.path.join(defaults_dir, '*.py'))
         for filepath in defaults:
