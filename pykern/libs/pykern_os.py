@@ -14,4 +14,8 @@ def listdir(path):
 
 
 def stat(path):
-    return stat_result(0)
+    try:
+        file_ = FileSystem().metadata[path]
+    except KeyError:
+        raise OSError('No such file "%s"' % path)
+    return stat_result(file_['file_size'])
