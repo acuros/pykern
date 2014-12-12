@@ -32,8 +32,11 @@ def chdir(path):
 def listdir(path):
     fs = FileSystem()
     absolute_target_path = fs.get_absolute_of('%s/' % path)
-    return [path[len(absolute_target_path):]
-            for path in FileSystem().metadata.keys() if path.startswith(absolute_target_path)]
+    return [
+        path[len(absolute_target_path):]
+        for path in FileSystem().metadata.keys()
+        if path.startswith(absolute_target_path) and path != absolute_target_path
+    ]
 
 
 def stat(path):

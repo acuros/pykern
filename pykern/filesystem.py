@@ -41,13 +41,12 @@ class FileSystem(object):
             with open(fs_file_name, 'w') as f:
                 f.write('\x00'*1024*1024)
                 f.seek(0)
-                f.write(bson.dumps(dict(metadata=[])))
+                f.write(bson.dumps(dict(metadata=[('/', dict(size=0, mode=stat.S_IFDIR))])))
             return open(fs_file_name, 'r+')
 
     def _load_metadata(self):
         raw_data = self.fs_file.read(1024*1024)
-        metadata = bson.loads(raw_data)['metadata']
-        return OrderedDict(metadata)
+        return OrderedDict(bson.loads(raw_data)['metadata'])
 
     def open_file(self, filename, mode='r'):
         filename = self.get_absolute_of(filename)
