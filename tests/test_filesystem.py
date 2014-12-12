@@ -16,7 +16,7 @@ def test_filesystem_file_write():
     assert data[1024*1024:] == '1234'
 
     metadata = bson.loads(data)['metadata']
-    assert metadata['file.txt']['size'] == 4
+    assert metadata['/file.txt']['size'] == 4
 
 
 def test_file_write():

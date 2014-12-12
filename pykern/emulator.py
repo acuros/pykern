@@ -13,10 +13,15 @@ class Emulator(object):
         original_builtins = dict((name, getattr(__builtin__, name)) for name in names)
         with open(filename, 'r') as f:
             code = f.read()
+
         original_modules = sys.modules.copy()
+        deep_original_modules = self._copy_original_modules()
         is_success = Kernel(fs_file_name).run_code(code)
         [setattr(__builtin__, name, value) for name, value in original_builtins.items()]
         sys.modules = original_modules
+        for module_name, module_copy in deep_original_modules.items():
+            for name, value in module_copy.items():
+                setattr(sys.modules[module_name], name, value)
         return is_success
 
     def install(self, fs_file_name, force=False):
@@ -40,3 +45,14 @@ class Emulator(object):
                     if not data:
                         break
                     vf.write(data)
+
+    def _copy_original_modules(self):
+        import libs
+        original_module_names = [name.split('pykern_')[1] for name in libs.__all__]
+        original_modules = dict()
+        for module_name in original_module_names:
+            original_modules[module_name] = dict(
+                (name, getattr(sys.modules[module_name], name))
+                for name in dir(sys.modules[module_name])
+            )
+        return original_modules

@@ -8,12 +8,12 @@ from pykern.shell import Shell
 class Kernel(object):
     def __init__(self, fs_file_name):
         self.filesystem = FileSystem(fs_file_name)
-        self.subtitue_libs()
+        self.substitue_libs()
 
     def boot(self):
         Shell(self).run()
 
-    def subtitue_libs(self):
+    def substitue_libs(self):
         patch_libs()
         self.filesystem.patch_all()
 

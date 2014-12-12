@@ -32,6 +32,7 @@ class FileSystem(object):
         self.metadata = self._load_metadata()
         self.current_dir = '/'
         self.opened_files = dict()
+        self.commands = FileSystemCommands(self)
 
     def _open_fs_file(self, fs_file_name):
         try:
@@ -49,6 +50,7 @@ class FileSystem(object):
         return OrderedDict(metadata)
 
     def open_file(self, filename, mode='r'):
+        filename = calculate_absolute(self.current_dir, filename)
         if mode.startswith('r'):
             fp = self._open_file_for_read(filename)
         elif mode.startswith('w'):
@@ -65,9 +67,7 @@ class FileSystem(object):
 
     def _open_file_for_write(self, filename):
         if filename not in self.metadata:
-            self.metadata[filename] = self.empty_metadata()
-            self.metadata[filename]['mode'] |= stat.S_IFREG
-            self.metadata[filename]['is_new'] = True
+            self.add_item(filename, stat.S_IFREG, True)
             return FStringIO(filename)
         else:
             raise NotImplementedError
@@ -90,13 +90,11 @@ class FileSystem(object):
             self.save_metadata()
         self.fs_file.flush()
 
-    def mkdir(self, dirname):
-        if dirname in self.metadata or dirname in ('.', '..'):
-            raise IOError('File exists')
-        if '/' in dirname:
-            raise ValueError('"/" is not permitted in directory name')
-        self.metadata[dirname] = self.empty_metadata()
-        self.metadata[dirname]['mode'] |= stat.S_IFDIR
+    def add_item(self, name, mode=0, is_new=False, size=0):
+        absolute_name = calculate_absolute(self.current_dir, name)
+        self.metadata[absolute_name] = dict(size=size, mode=mode)
+        if is_new:
+            self.metadata[absolute_name]['is_new'] = True
 
     def _move_fs_cursor_to(self, filename):
         start_pos = 1024*1024
@@ -117,6 +115,11 @@ class FileSystem(object):
     def patch_all(self):
         import __builtin__
         __builtin__.open = __builtin__.file = self.open_file
+
+
+class FileSystemCommands(object):
+    def __init__(self, filesystem):
+        self.filesystem = filesystem
 
 
 def is_relative_path(path):
