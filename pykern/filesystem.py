@@ -50,7 +50,7 @@ class FileSystem(object):
         return OrderedDict(metadata)
 
     def open_file(self, filename, mode='r'):
-        filename = calculate_absolute(self.current_dir, filename)
+        filename = self.get_absolute_of(filename)
         if mode.startswith('r'):
             fp = self._open_file_for_read(filename)
         elif mode.startswith('w'):
@@ -91,10 +91,13 @@ class FileSystem(object):
         self.fs_file.flush()
 
     def add_item(self, name, mode=0, is_new=False, size=0):
-        absolute_name = calculate_absolute(self.current_dir, name)
+        absolute_name = self.get_absolute_of(name)
         self.metadata[absolute_name] = dict(size=size, mode=mode)
         if is_new:
             self.metadata[absolute_name]['is_new'] = True
+
+    def get_absolute_of(self, path):
+        return _calculate_absolute(self.current_dir, path)
 
     def _move_fs_cursor_to(self, filename):
         start_pos = 1024*1024
@@ -126,7 +129,7 @@ def is_relative_path(path):
     return not path.startswith('/')
 
 
-def calculate_absolute(current_dir, path):
+def _calculate_absolute(current_dir, path):
     if not is_relative_path(path):
         return path
 

@@ -1,4 +1,4 @@
-from pykern.filesystem import FileSystem, calculate_absolute
+from pykern.filesystem import FileSystem
 
 
 class stat_result(object):
@@ -23,7 +23,7 @@ def mkdir(dirname):
 def chdir(path):
     import os
     fs = FileSystem()
-    absolute_path = calculate_absolute(fs.current_dir, '%s' % path)
+    absolute_path = fs.get_absolute_of('%s' % path)
     if not os.path.isdir(absolute_path):
         raise OSError('Not a directory: "%s"' % path)
     fs.current_dir = absolute_path
@@ -31,14 +31,14 @@ def chdir(path):
 
 def listdir(path):
     fs = FileSystem()
-    absolute_target_path = calculate_absolute(fs.current_dir, '%s/' % path)
+    absolute_target_path = fs.get_absolute_of('%s/' % path)
     return [path[len(absolute_target_path):]
             for path in FileSystem().metadata.keys() if path.startswith(absolute_target_path)]
 
 
 def stat(path):
     fs = FileSystem()
-    path = calculate_absolute(fs.current_dir, path)
+    path = fs.get_absolute_of(path)
     try:
         file_ = fs.metadata[path]
     except KeyError:

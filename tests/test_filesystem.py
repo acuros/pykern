@@ -1,6 +1,6 @@
 import bson
 
-from pykern.filesystem import FileSystem, calculate_absolute
+from pykern.filesystem import FileSystem, _calculate_absolute
 from tests.utils import run_file_in_kernel
 
 
@@ -28,9 +28,9 @@ def test_directories():
 
 
 def test_relative_path():
-    assert calculate_absolute('/', '.') == '/'
-    assert calculate_absolute('/', 'foo') == '/foo'
-    assert calculate_absolute('/', 'foo/bar') == '/foo/bar'
-    assert calculate_absolute('/foo/bar', '..') == '/foo'
-    assert calculate_absolute('/foo/bar/', '../foo') == '/foo/foo'
-    assert calculate_absolute('/', '../../../') == '/'
+    assert _calculate_absolute('/', '.') == '/'
+    assert _calculate_absolute('/', 'foo') == '/foo'
+    assert _calculate_absolute('/', 'foo/bar') == '/foo/bar'
+    assert _calculate_absolute('/foo/bar', '..') == '/foo'
+    assert _calculate_absolute('/foo/bar/', '../foo') == '/foo/foo'
+    assert _calculate_absolute('/', '../../../') == '/'
