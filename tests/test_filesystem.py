@@ -16,11 +16,15 @@ def test_filesystem_file_write():
     assert data[1024*1024:] == '1234'
 
     metadata = bson.loads(data)['metadata']
-    assert metadata['file.txt']['file_size'] == 4
+    assert metadata['file.txt']['size'] == 4
 
 
-def test_filesystem_in_kernel():
+def test_file_write():
     assert run_file_in_kernel('file_write.py')
+
+
+def test_directories():
+    assert run_file_in_kernel('directories.py')
 
 
 def test_relative_path():

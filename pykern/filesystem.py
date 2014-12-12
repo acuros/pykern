@@ -1,3 +1,4 @@
+import stat
 import bson
 
 from collections import OrderedDict
@@ -65,6 +66,7 @@ class FileSystem(object):
     def _open_file_for_write(self, filename):
         if filename not in self.metadata:
             self.metadata[filename] = self.empty_metadata()
+            self.metadata[filename]['mode'] |= stat.S_IFREG
             self.metadata[filename]['is_new'] = True
             return FStringIO(filename)
         else:
@@ -72,7 +74,7 @@ class FileSystem(object):
 
     def read_file(self, filename):
         self._move_fs_cursor_to(filename)
-        return self.fs_file.read(self.metadata[filename]['file_size'])
+        return self.fs_file.read(self.metadata[filename]['size'])
 
     def close_file(self, vfile):
         mode = self.opened_files.pop(vfile.filename)
@@ -83,7 +85,7 @@ class FileSystem(object):
             vfile.seek(0)
             data = vfile.read()
             self.fs_file.write(data)
-            self.metadata[vfile.filename]['file_size'] = len(data)
+            self.metadata[vfile.filename]['size'] = len(data)
             del self.metadata[vfile.filename]['is_new']
             self.save_metadata()
         self.fs_file.flush()
@@ -93,14 +95,15 @@ class FileSystem(object):
             raise IOError('File exists')
         if '/' in dirname:
             raise ValueError('"/" is not permitted in directory name')
-        self.metadata[dirname] = dict(file_size=0, is_directory=True)
+        self.metadata[dirname] = self.empty_metadata()
+        self.metadata[dirname]['mode'] |= stat.S_IFDIR
 
     def _move_fs_cursor_to(self, filename):
         start_pos = 1024*1024
         for _filename, _metadata in self.metadata.items():
             if _filename == filename:
                 break
-            start_pos += _metadata['file_size']
+            start_pos += _metadata['size']
         self.fs_file.seek(start_pos)
 
     def save_metadata(self):
@@ -109,7 +112,7 @@ class FileSystem(object):
 
     @staticmethod
     def empty_metadata():
-        return dict(file_size=0)
+        return dict(mode=0, size=0)
 
     def patch_all(self):
         import __builtin__
