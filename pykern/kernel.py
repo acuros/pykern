@@ -24,7 +24,7 @@ class Kernel(object):
 
     def run_code(self, code):
         try:
-            exec compile(code, '<string>', 'exec') in dict()
+            exec compile(code, '<string>', 'exec') in {'__name__': '__main__'}
         except:
             return False
         else:
