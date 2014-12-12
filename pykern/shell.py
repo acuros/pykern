@@ -8,15 +8,16 @@ class Shell(object):
     def run(self):
         while True:
             try:
-                filename = raw_input('$ ')
+                command = raw_input('$ ').strip()
             except EOFError:
                 print
                 break
-            if not filename:
+            if not command:
                 continue
+            args = command.split()
             try:
-                self.kernel.run_file(filename)
+                self.kernel.run_file(args[0], args)
             except IOError:
-                print 'File "%s" not found' % filename
+                print '%s: command not found' % args[0]
             else:
                 gc.collect()

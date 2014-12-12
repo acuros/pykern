@@ -18,9 +18,12 @@ class Kernel(object):
         sys.modules.update(new_modules)
         self.filesystem.patch_all()
 
-    def run_file(self, filename):
+    def run_file(self, filename, args):
         with open(filename) as f:
-            return self.run_code(f.read())
+            sys.argv = args
+            result = self.run_code(f.read())
+            sys.argv = []
+            return result
 
     def run_code(self, code):
         try:
