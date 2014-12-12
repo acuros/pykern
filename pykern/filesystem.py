@@ -1,8 +1,7 @@
-import os
+import bson
+
 from collections import OrderedDict
 from StringIO import StringIO
-
-import bson
 
 from pykern.utils import singleton
 
@@ -30,6 +29,7 @@ class FileSystem(object):
             raise TypeError('Require fs_file_name')
         self.fs_file = self._open_fs_file(fs_file_name)
         self.metadata = self._load_metadata()
+        self.current_dir = '/'
         self.opened_files = dict()
 
     def _open_fs_file(self, fs_file_name):
@@ -107,4 +107,26 @@ class FileSystem(object):
     def patch_all(self):
         import __builtin__
         __builtin__.open = __builtin__.file = self.open_file
+
+
+def is_relative_path(path):
+    return not path.startswith('/')
+
+
+def calculate_absolute(current_dir, path):
+    if not is_relative_path(path):
+        return path
+
+    current_dentries = [dentry for dentry in current_dir.split('/') if dentry]
+    dentries_to_apply = path.split('/')
+    while dentries_to_apply:
+        next_dentry = dentries_to_apply.pop(0)
+        if next_dentry in ('', '.'):
+            continue
+        elif next_dentry == '..':
+            if len(current_dentries) > 0:
+                current_dentries.pop()
+        else:
+            current_dentries.append(next_dentry)
+    return '/%s' % '/'.join(current_dentries)
 
