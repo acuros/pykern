@@ -2,17 +2,27 @@ import argparse
 import math
 import os
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-l', action='store_true')
+parser.add_argument('-a', action='store_true')
 args = parser.parse_args()
 
+
+def get_filenames():
+    global args
+    names = os.listdir('.')
+    if args.a:
+        names += ['.', '..']
+    return sorted(names)
+
+
 if args.l:
-    filenames = os.listdir('.')
-    stats = [os.stat(name) for name in filenames]
-    stats = dict((name, os.stat(name)) for name in filenames)
-    max_size = max([stat.st_size for stat in stats.values()])
+    filenames = get_filenames()
+    stats = [(name, os.stat(name)) for name in filenames]
+    max_size = max([stat.st_size for _, stat in stats])
     size_buffer = str(int(math.log(max_size, 10)) + 1)
-    for name, stat in stats.items():
+    for name, stat in stats:
         print '%{0}d %s'.format(size_buffer) % (stat.st_size, name)
 else:
-    print ' '.join(os.listdir('.'))
+    print ' '.join(get_filenames())
