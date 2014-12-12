@@ -7,19 +7,19 @@ from kernel import Kernel
 
 
 class Emulator(object):
-    def run_external_file(self, filename):
+    def run_external_file(self, filename, fs_file_name):
         import __builtin__
         names = dir(__builtin__)
         original_builtins = dict((name, getattr(__builtin__, name)) for name in names)
         with open(filename, 'r') as f:
             code = f.read()
         original_modules = sys.modules.copy()
-        is_success = Kernel().run_code(code)
+        is_success = Kernel(fs_file_name).run_code(code)
         [setattr(__builtin__, name, value) for name, value in original_builtins.items()]
         sys.modules = original_modules
         return is_success
 
-    def install(self, fs_file_name=None, force=False):
+    def install(self, fs_file_name, force=False):
         if os.path.exists(fs_file_name):
             if not force:
                 raise ValueError('Already installed')

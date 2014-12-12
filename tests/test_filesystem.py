@@ -5,7 +5,7 @@ from tests.utils import run_file_in_kernel
 
 
 def test_filesystem_file_write():
-    fs = FileSystem()
+    fs = FileSystem('pykern.test.fs')
     with fs.open_file('file.txt', 'w') as f:
         f.write('1234')
 

@@ -19,14 +19,14 @@ class FStringIO(StringIO):
         self.close()
 
     def close(self):
-        FileSystem().close_file(self)
+        FileSystem(None).close_file(self)
         StringIO.close(self)
 
 
 @singleton
 class FileSystem(object):
-    def __init__(self, fs_file_name=None):
-        self.fs_file_name = fs_file_name or os.getenv('PYKERN_FS_FILENAME') or 'pykern.fs'
+    def __init__(self, fs_file_name):
+        self.fs_file_name = fs_file_name
         try:
             self.fs_file = open(self.fs_file_name, 'r+')
         except IOError:
