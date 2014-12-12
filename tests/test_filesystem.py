@@ -9,7 +9,7 @@ def test_filesystem_file_write():
     with fs.open_file('file.txt', 'w') as f:
         f.write('1234')
 
-    with open(fs.fs_file_name, 'r') as f:
+    with open('pykern.test.fs', 'r') as f:
         data = f.read()
     assert len(data) > 0
 

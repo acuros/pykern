@@ -28,17 +28,19 @@ class FileSystem(object):
     def __init__(self, fs_file_name=None):
         if fs_file_name is None:
             raise TypeError('Require fs_file_name')
-        self.fs_file_name = fs_file_name
+        self.fs_file = self._open_fs_file(fs_file_name)
+        self.metadata = self._load_metadata()
+        self.opened_files = dict()
+
+    def _open_fs_file(self, fs_file_name):
         try:
-            self.fs_file = open(self.fs_file_name, 'r+')
+            return open(fs_file_name, 'r+')
         except IOError:
-            with open(self.fs_file_name, 'w') as f:
+            with open(fs_file_name, 'w') as f:
                 f.write('\x00'*1024*1024)
                 f.seek(0)
                 f.write(bson.dumps(dict(metadata=[])))
-            self.fs_file = open(self.fs_file_name, 'r+')
-        self.metadata = self._load_metadata()
-        self.opened_files = dict()
+            return open(fs_file_name, 'r+')
 
     def _load_metadata(self):
         raw_data = self.fs_file.read(1024*1024)
