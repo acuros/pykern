@@ -109,7 +109,7 @@ class FileSystem(object):
 
     def save_metadata(self):
         self.fs_file.seek(0)
-        self.fs_file.write(bson.dumps(dict(metadata=self.metadata)))
+        self.fs_file.write(bson.dumps(dict(metadata=self.metadata.items())))
 
     @staticmethod
     def empty_metadata():
