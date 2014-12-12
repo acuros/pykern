@@ -32,6 +32,7 @@ def main():
                     exec compile(code, '<string>', 'exec')
             except Exception, e:
                 traceback.print_exc()
+                print e
 
             lines = []
 
