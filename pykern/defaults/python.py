@@ -2,7 +2,7 @@ import readline
 import traceback
 
 
-def line_not_finished(line):
+def line_finished(line):
     return not line.endswith(':')
 
 
@@ -23,7 +23,7 @@ def main():
             continue
 
         lines.append(line)
-        if len(lines) == 1 and line_not_finished(line) or line == '':
+        if len(lines) == 1 and line_finished(line) or line == '':
             code = '\n'.join(lines)
             try:
                 try:
