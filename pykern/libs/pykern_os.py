@@ -10,7 +10,7 @@ class stat_result(object):
 
 
 def listdir(path):
-    return FileSystem(None).metadata.keys()
+    return FileSystem().metadata.keys()
 
 
 def stat(path):

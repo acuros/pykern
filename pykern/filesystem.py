@@ -19,13 +19,15 @@ class FStringIO(StringIO):
         self.close()
 
     def close(self):
-        FileSystem(None).close_file(self)
+        FileSystem().close_file(self)
         StringIO.close(self)
 
 
 @singleton
 class FileSystem(object):
-    def __init__(self, fs_file_name):
+    def __init__(self, fs_file_name=None):
+        if fs_file_name is None:
+            raise TypeError('Require fs_file_name')
         self.fs_file_name = fs_file_name
         try:
             self.fs_file = open(self.fs_file_name, 'r+')
