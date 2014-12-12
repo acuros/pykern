@@ -1,7 +1,7 @@
 import sys
 
 from filesystem import FileSystem
-from pykern import libs
+from pykern.libs import patch_libs
 from pykern.shell import Shell
 
 
@@ -14,8 +14,7 @@ class Kernel(object):
         Shell(self).run()
 
     def subtitue_libs(self):
-        new_modules = dict((name.split('pykern_')[1], getattr(libs, name)) for name in libs.__all__)
-        sys.modules.update(new_modules)
+        patch_libs()
         self.filesystem.patch_all()
 
     def run_file(self, filename, args):
