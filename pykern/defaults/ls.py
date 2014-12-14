@@ -26,6 +26,7 @@ if args.l:
     else:
         size_buffer = str(int(math.log(max_size, 10)) + 1)
     for name, stat in stats:
-        print '%{0}d %s'.format(size_buffer) % (stat.st_size, name)
+        mode = 'd' if stat.is_directory() else '-'
+        print '%s %{0}d %s'.format(size_buffer) % (mode, stat.st_size, name)
 else:
     print ' '.join(get_filenames())

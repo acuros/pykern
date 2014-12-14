@@ -9,6 +9,10 @@ class stat_result(object):
     def __repr__(self):
         return '<stat_result: st_size=%d>' % self.st_size
 
+    def is_directory(self):
+        import stat
+        return stat.S_ISDIR(self.st_mode)
+
 
 def mkdir(dirname):
     import stat
