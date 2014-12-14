@@ -1,3 +1,4 @@
+import readline
 import gc
 import os
 
@@ -13,6 +14,9 @@ class Shell(object):
             except EOFError:
                 print
                 break
+            except KeyboardInterrupt:
+                print
+                continue
             if not command:
                 continue
             args = command.split()
