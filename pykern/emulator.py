@@ -42,16 +42,16 @@ class Emulator(object):
         with open(disk_file_name, 'wb+') as disk:
             disk.write('\x00'*1024*1024)
             disk.seek(0, 0)
-            disk.write(bson.dumps(dict(metadata=[])))
+            disk.write(bson.dumps(dict(superblocks=[])))
             disk.seek(0, 0)
 
             fs = FileSystem(disk)
 
-            fs.add_item('/', fs.DIRECTORY_MODE)
+            fs.add_superblock('/', fs.DIRECTORY_MODE)
 
             bin_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'bin')
             bins = glob.glob(os.path.join(bin_dir, '*.py'))
-            fs.add_item('/bin', fs.DIRECTORY_MODE)
+            fs.add_superblock('/bin', fs.DIRECTORY_MODE)
 
             for filepath in bins:
                 self.put_file(filepath, '/bin', disk_file_name)
@@ -67,7 +67,7 @@ class Emulator(object):
         with open(disk_file_name, 'w') as disk:
             disk.write('\x00'*1024*1024)
             disk.seek(0)
-            disk.write(bson.dumps(dict(metadata=[('/', dict(size=0, mode=stat.S_IFDIR))])))
+            disk.write(bson.dumps(dict(superblocks=[('/', dict(size=0, mode=stat.S_IFDIR))])))
 
     def put_file(self, src, dst='/', fs_file_name=None):
         with open(src, 'rb') as rf:

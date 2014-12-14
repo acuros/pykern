@@ -7,7 +7,7 @@ from StringIO import StringIO
 
 class FStringIO(StringIO):
     def __init__(self, filename, data=''):
-        self.filename = filename
+        self.name = filename
         StringIO.__init__(self, data)
 
     def __enter__(self):
@@ -54,13 +54,13 @@ class FileSystem(object):
         if disk is None:
             raise TypeError('Disk fd is omitted')
         self.disk = disk
-        self.metadata = self._load_metadata()
+        self.superblocks = self._load_superblocks()
         self.current_dir = '/'
         self.opened_files = dict()
 
-    def _load_metadata(self):
+    def _load_superblocks(self):
         raw_data = self.disk.read(1024*1024)
-        return OrderedDict(bson.loads(raw_data)['metadata'])
+        return OrderedDict(bson.loads(raw_data)['superblocks'])
 
     def open_file(self, filename, mode='r'):
         filename = self.get_absolute_of(filename)
@@ -74,20 +74,20 @@ class FileSystem(object):
         return fp
 
     def _open_file_for_read(self, filename):
-        if filename not in self.metadata:
+        if filename not in self.superblocks:
             raise IOError('File %s is not exists' % filename)
         return FStringIO(filename, self.read_file(filename))
 
     def _open_file_for_write(self, filename):
-        if filename not in self.metadata:
-            self.add_item(filename, stat.S_IFREG)
+        if filename not in self.superblocks:
+            self.add_superblock(filename, stat.S_IFREG)
             return FStringIO(filename)
         else:
             raise NotImplementedError
 
     def read_file(self, filename):
         self._move_fs_cursor_to(filename)
-        return self.disk.read(self.metadata[filename]['size'])
+        return self.disk.read(self.superblocks[filename]['size'])
 
     def close_file(self, vfile):
         mode = self.opened_files.pop(vfile.filename)
@@ -98,28 +98,28 @@ class FileSystem(object):
             vfile.seek(0)
             data = vfile.read()
             self.disk.write(data)
-            self.metadata[vfile.filename]['size'] = len(data)
-            self.save_metadata()
+            self.superblocks[vfile.name]['size'] = len(data)
+            self.save_superblocks()
         self.disk.flush()
 
-    def add_item(self, name, mode=0, size=0):
+    def add_superblock(self, name, mode=0, size=0):
         absolute_name = self.get_absolute_of(name)
-        self.metadata[absolute_name] = dict(size=size, mode=mode)
+        self.superblocks[absolute_name] = dict(size=size, mode=mode)
 
     def get_absolute_of(self, path):
         return _calculate_absolute(self.current_dir, path)
 
     def _move_fs_cursor_to(self, filename):
         start_pos = 1024*1024
-        for _filename, _metadata in self.metadata.items():
-            if _filename == filename:
+        for filename_, superblock in self.superblocks.items():
+            if filename_ == filename:
                 break
-            start_pos += _metadata['size']
+            start_pos += superblock['size']
         self.disk.seek(start_pos)
 
-    def save_metadata(self):
+    def save_superblocks(self):
         self.disk.seek(0)
-        self.disk.write(bson.dumps(dict(metadata=self.metadata.items())))
+        self.disk.write(bson.dumps(dict(superblocks=self.superblocks.items())))
 
     def patch_all(self):
         import __builtin__

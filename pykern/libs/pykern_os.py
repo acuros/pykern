@@ -21,11 +21,11 @@ class stat_result(object):
 def mkdir(dirname):
     import stat
     fs = FileSystem()
-    if dirname in fs.metadata or dirname in ('.', '..'):
+    if dirname in fs.superblocks or dirname in ('.', '..'):
         raise IOError('File exists')
     if '/' in dirname:
         raise ValueError('"/" is not permitted in directory name')
-    fs.add_item(dirname, stat.S_IFDIR)
+    fs.add_superblock(dirname, stat.S_IFDIR)
 
 
 def getcwd():
@@ -49,7 +49,7 @@ def listdir(path):
         absolute_target_path += '/'
     result = [
         path[len(absolute_target_path):]
-        for path in FileSystem().metadata
+        for path in FileSystem().superblocks
         if path.startswith(absolute_target_path) and
         '/' not in path.split(absolute_target_path, 1)[1] and
         path != absolute_target_path
@@ -61,7 +61,7 @@ def stat(path):
     fs = FileSystem()
     path = fs.get_absolute_of(path)
     try:
-        file_ = fs.metadata[path]
+        file_ = fs.superblocks[path]
     except KeyError:
         raise OSError('No such file "%s"' % path)
 
