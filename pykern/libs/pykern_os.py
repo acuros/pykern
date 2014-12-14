@@ -7,7 +7,9 @@ class stat_result(object):
         self.st_size = st_size
 
     def __repr__(self):
-        return '<stat_result: st_size=%d>' % self.st_size
+        return '<stat_result: st_mode=%d, st_size=%d>' % (
+            self.st_mode, self.st_size,
+        )
 
     def is_directory(self):
         import stat
