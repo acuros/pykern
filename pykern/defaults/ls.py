@@ -21,7 +21,10 @@ if args.l:
     filenames = get_filenames()
     stats = [(name, os.stat(name)) for name in filenames]
     max_size = max([stat.st_size for _, stat in stats])
-    size_buffer = str(int(math.log(max_size, 10)) + 1)
+    if max_size == 0:
+        size_buffer = 2
+    else:
+        size_buffer = str(int(math.log(max_size, 10)) + 1)
     for name, stat in stats:
         print '%{0}d %s'.format(size_buffer) % (stat.st_size, name)
 else:

@@ -1,4 +1,5 @@
 import gc
+import os
 
 
 class Shell(object):
@@ -16,7 +17,7 @@ class Shell(object):
                 continue
             args = command.split()
             try:
-                self.kernel.run_file(args[0], args)
+                self.kernel.run_file(os.path.join('/bin', args[0]), args)
             except IOError:
                 print '%s: command not found' % args[0]
             else:

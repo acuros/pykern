@@ -1,5 +1,6 @@
 import glob
 import os
+import stat
 import sys
 
 from pykern.filesystem import FileSystem
@@ -33,12 +34,15 @@ class Emulator(object):
         FileSystem(fs_file_name)
         defaults_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'defaults')
         defaults = glob.glob(os.path.join(defaults_dir, '*.py'))
+        fs = FileSystem(fs_file_name)
+        fs.add_item('/bin', stat.S_IFDIR)
         for filepath in defaults:
-            self.put_file(filepath, fs_file_name)
+            self.put_file(filepath, '/bin', fs_file_name)
 
-    def put_file(self, filepath, fs_file_name=None):
-        with open(filepath, 'rb') as rf:
-            filename = '.'.join(os.path.split(filepath)[1].split('.')[:-1])
+    def put_file(self, src, dst='/', fs_file_name=None):
+        with open(src, 'rb') as rf:
+            filename = '.'.join(os.path.split(src)[1].split('.')[:-1])
+            filename = os.path.join(dst, filename)
             with FileSystem(fs_file_name).open_file(filename, 'w') as vf:
                 while True:
                     data = rf.read(10240)
