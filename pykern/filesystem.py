@@ -57,7 +57,6 @@ class FileSystem(object):
         self.metadata = self._load_metadata()
         self.current_dir = '/'
         self.opened_files = dict()
-        self.commands = FileSystemCommands(self)
 
     def _load_metadata(self):
         raw_data = self.disk.read(1024*1024)
@@ -125,18 +124,9 @@ class FileSystem(object):
         self.disk.seek(0)
         self.disk.write(bson.dumps(dict(metadata=self.metadata.items())))
 
-    @staticmethod
-    def empty_metadata():
-        return dict(mode=0, size=0)
-
     def patch_all(self):
         import __builtin__
         __builtin__.open = __builtin__.file = self.open_file
-
-
-class FileSystemCommands(object):
-    def __init__(self, filesystem):
-        self.filesystem = filesystem
 
 
 def _calculate_absolute(current_dir, path):
