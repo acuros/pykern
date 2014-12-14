@@ -49,7 +49,7 @@ def listdir(path):
         absolute_target_path += '/'
     result = [
         path[len(absolute_target_path):]
-        for path in FileSystem().metadata.keys()
+        for path in FileSystem().metadata
         if path.startswith(absolute_target_path) and
         '/' not in path.split(absolute_target_path, 1)[1] and
         path != absolute_target_path
