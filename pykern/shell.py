@@ -10,7 +10,7 @@ class Shell(object):
     def run(self):
         while True:
             try:
-                command = raw_input('$ ').strip()
+                command = raw_input('%s $ ' % os.getcwd()).strip()
             except EOFError:
                 print
                 break
