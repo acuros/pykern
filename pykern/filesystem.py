@@ -50,7 +50,9 @@ class FileSystem(object):
     FILE_MODE = stat.S_IFREG
     DIRECTORY_MODE = stat.S_IFDIR
 
-    def __init__(self, disk):
+    def __init__(self, disk=None):
+        if disk is None:
+            raise TypeError('Disk fd is omitted')
         self.disk = disk
         self.metadata = self._load_metadata()
         self.current_dir = '/'
