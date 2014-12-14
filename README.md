@@ -1,38 +1,48 @@
 pykern
 ======
 
-Just For Fun. Virtual kernel in python
-Still sharing many functions from host, getting separated.
+Just For Fun. Virtual kernel in python. Still sharing many functions from host, getting separated. The concept is emulator provides python instead of machine language
 
 ```sh
 acuros@AcurosDevMachine ~/Documents/pykern (master)$ python manage.py install -f
 acuros@AcurosDevMachine ~/Documents/pykern (master)$ python manage.py run
-$ ls
-python ls cat
-$ ls -l
-888 python
-568 ls
-703 cat
-$ python
+/ $ ls -al
+d  0 .
+d  0 ..
+d  0 bin
+/ $ cd bin
+/bin $ ls -al
+d   0 .
+d   0 ..
+- 721 cat
+- 104 cd
+- 805 ls
+- 148 mkdir
+-  28 pwd
+- 888 python
+/bin $ cat pwd
+import os
+
+print os.getcwd()
+/bin $ python
 Pykern Python Interpreter v0.2
->>> import os
->>> os.listdir('.')
-[u'python', u'ls', u'cat']
->>> with open('asdf.txt', 'w') as f:
+>>> with open('/foo', 'w') as f:
 ...   f.write('test')
 ... 
->>> with open('asdf.txt', 'r') as f:
+>>> with open('/foo', 'r') as f:
 ...   print f.read()
 ... 
 test
 >>> 
-$ 
-$ 
-$ ls
-python ls cat asdf.txt
-$ cat asdf.txt
+/bin $ cd ..
+/ $ ls -al
+d 0 .
+d 0 ..
+d 0 bin
+- 4 foo
+/ $ cat foo
 test
-$ 
+/ $
 acuros@AcurosDevMachine ~/Documents/pykern (master)$ ls
 manage.py  pykern  pykern.fs  tests
 acuros@AcurosDevMachine ~/Documents/pykern (master)$ ls -l
