@@ -24,6 +24,10 @@ def mkdir(dirname):
     fs.add_item(dirname, stat.S_IFDIR)
 
 
+def getcwd():
+    return FileSystem().current_dir
+
+
 def chdir(path):
     import os
     fs = FileSystem()
