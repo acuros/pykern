@@ -80,7 +80,7 @@ class FileSystem(object):
 
     def _open_file_for_write(self, filename):
         if filename not in self.metadata:
-            self.add_item(filename, stat.S_IFREG, True)
+            self.add_item(filename, stat.S_IFREG)
             return FStringIO(filename)
         else:
             raise NotImplementedError
@@ -93,21 +93,18 @@ class FileSystem(object):
         mode = self.opened_files.pop(vfile.filename)
         if mode == 'r':
             return
-        if mode == 'w' and 'is_new' in self.metadata[vfile.filename]:
+        elif mode == 'w':
             self.disk.seek(0, 2)
             vfile.seek(0)
             data = vfile.read()
             self.disk.write(data)
             self.metadata[vfile.filename]['size'] = len(data)
-            del self.metadata[vfile.filename]['is_new']
             self.save_metadata()
         self.disk.flush()
 
-    def add_item(self, name, mode=0, is_new=False, size=0):
+    def add_item(self, name, mode=0, size=0):
         absolute_name = self.get_absolute_of(name)
         self.metadata[absolute_name] = dict(size=size, mode=mode)
-        if is_new:
-            self.metadata[absolute_name]['is_new'] = True
 
     def get_absolute_of(self, path):
         return _calculate_absolute(self.current_dir, path)
