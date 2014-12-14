@@ -44,12 +44,16 @@ class Emulator(object):
             disk.seek(0, 0)
             disk.write(bson.dumps(dict(metadata=[])))
             disk.seek(0, 0)
+
             fs = FileSystem(disk)
-            defaults_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'defaults')
-            defaults = glob.glob(os.path.join(defaults_dir, '*.py'))
+
             fs.add_item('/', fs.DIRECTORY_MODE)
+
+            bin_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'bin')
+            bins = glob.glob(os.path.join(bin_dir, '*.py'))
             fs.add_item('/bin', fs.DIRECTORY_MODE)
-            for filepath in defaults:
+
+            for filepath in bins:
                 self.put_file(filepath, '/bin', disk_file_name)
 
     def ready_kernel(self, disk):
@@ -71,11 +75,13 @@ class Emulator(object):
             filename = os.path.join(dst, filename)
             with open(fs_file_name, 'r+') as disk:
                 with FileSystem(disk).open_file(filename, 'w') as vf:
-                    while True:
-                        data = rf.read(10240)
-                        if not data:
-                            break
-                        vf.write(data)
+                    self._copy(rf, vf)
+
+    def _copy(self, src, dst, buffer_size=10240):
+        data = src.read(buffer_size)
+        while data:
+            dst.write(data)
+            data = src.read(buffer_size)
 
     def _copy_original_modules(self):
         import libs
