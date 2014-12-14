@@ -24,5 +24,8 @@ class Shell(object):
                 self.kernel.run_file(os.path.join('/bin', args[0]), args)
             except IOError:
                 print '%s: command not found' % args[0]
+            except SystemExit:
+                gc.collect()
+                continue
             else:
                 gc.collect()
