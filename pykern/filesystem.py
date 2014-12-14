@@ -4,8 +4,6 @@ import bson
 from collections import OrderedDict
 from StringIO import StringIO
 
-from pykern.utils import singleton
-
 
 class FStringIO(StringIO):
     def __init__(self, filename, data=''):
@@ -23,29 +21,44 @@ class FStringIO(StringIO):
         StringIO.close(self)
 
 
-@singleton
+class FileSystemSingleton(type):
+    _disks = {}
+
+    def __call__(cls, fd=None):
+        if fd is None:
+            if not cls._disks:
+                raise TypeError('No disk loaded. Disk fd is required')
+            if len(cls._disks) > 1:
+                raise TypeError('More than one disk loaded. Disk fd is required')
+            disk = cls._disks.values()[0]
+            if disk['fd'].closed:
+                raise TypeError('Loaded disk fd is already closed. Disk fd is required')
+            return disk['instance']
+
+        disk = cls._disks.get(fd.name)
+        if not disk or disk['fd'].closed:
+            instance = super(FileSystemSingleton, cls).__call__(fd)
+            cls._disks[fd.name] = dict(instance=instance, fd=fd)
+        else:
+            instance = disk['instance']
+        return instance
+
+
 class FileSystem(object):
-    def __init__(self, fs_file_name=None):
-        if fs_file_name is None:
-            raise TypeError('Require fs_file_name')
-        self.fs_file = self._open_fs_file(fs_file_name)
+    __metaclass__ = FileSystemSingleton
+
+    FILE_MODE = stat.S_IFREG
+    DIRECTORY_MODE = stat.S_IFDIR
+
+    def __init__(self, disk):
+        self.disk = disk
         self.metadata = self._load_metadata()
         self.current_dir = '/'
         self.opened_files = dict()
         self.commands = FileSystemCommands(self)
 
-    def _open_fs_file(self, fs_file_name):
-        try:
-            return open(fs_file_name, 'r+')
-        except IOError:
-            with open(fs_file_name, 'w') as f:
-                f.write('\x00'*1024*1024)
-                f.seek(0)
-                f.write(bson.dumps(dict(metadata=[('/', dict(size=0, mode=stat.S_IFDIR))])))
-            return open(fs_file_name, 'r+')
-
     def _load_metadata(self):
-        raw_data = self.fs_file.read(1024*1024)
+        raw_data = self.disk.read(1024*1024)
         return OrderedDict(bson.loads(raw_data)['metadata'])
 
     def open_file(self, filename, mode='r'):
@@ -73,21 +86,21 @@ class FileSystem(object):
 
     def read_file(self, filename):
         self._move_fs_cursor_to(filename)
-        return self.fs_file.read(self.metadata[filename]['size'])
+        return self.disk.read(self.metadata[filename]['size'])
 
     def close_file(self, vfile):
         mode = self.opened_files.pop(vfile.filename)
         if mode == 'r':
             return
         if mode == 'w' and 'is_new' in self.metadata[vfile.filename]:
-            self.fs_file.seek(0, 2)
+            self.disk.seek(0, 2)
             vfile.seek(0)
             data = vfile.read()
-            self.fs_file.write(data)
+            self.disk.write(data)
             self.metadata[vfile.filename]['size'] = len(data)
             del self.metadata[vfile.filename]['is_new']
             self.save_metadata()
-        self.fs_file.flush()
+        self.disk.flush()
 
     def add_item(self, name, mode=0, is_new=False, size=0):
         absolute_name = self.get_absolute_of(name)
@@ -104,11 +117,11 @@ class FileSystem(object):
             if _filename == filename:
                 break
             start_pos += _metadata['size']
-        self.fs_file.seek(start_pos)
+        self.disk.seek(start_pos)
 
     def save_metadata(self):
-        self.fs_file.seek(0)
-        self.fs_file.write(bson.dumps(dict(metadata=self.metadata.items())))
+        self.disk.seek(0)
+        self.disk.write(bson.dumps(dict(metadata=self.metadata.items())))
 
     @staticmethod
     def empty_metadata():
@@ -144,4 +157,3 @@ def _calculate_absolute(current_dir, path):
         else:
             current_dentries.append(next_dentry)
     return '/%s' % '/'.join(current_dentries)
-

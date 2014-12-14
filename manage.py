@@ -23,7 +23,7 @@ emulator = Emulator()
 if args.command == 'install':
     emulator.install(args.fs_file_name, args.force)
 elif args.command == 'run':
-    Kernel(args.fs_file_name).boot()
+    emulator.boot(args.fs_file_name)
 else:
     print 'Command "%s" not found' % args.command
     sys.exit(1)

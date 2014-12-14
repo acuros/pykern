@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import bson
 
 from pykern.filesystem import FileSystem, _calculate_absolute
@@ -5,9 +6,10 @@ from tests.utils import run_file_in_kernel
 
 
 def test_filesystem_file_write():
-    fs = FileSystem('pykern.test.fs')
-    with fs.open_file('file.txt', 'w') as f:
-        f.write('1234')
+    with open('pykern.test.fs', 'r+') as disk:
+        fs = FileSystem(disk)
+        with fs.open_file('file.txt', 'w') as f:
+            f.write('1234')
 
     with open('pykern.test.fs', 'r') as f:
         data = f.read()
@@ -15,7 +17,7 @@ def test_filesystem_file_write():
 
     assert data[1024*1024:] == '1234'
 
-    metadata = bson.loads(data)['metadata']
+    metadata = OrderedDict(bson.loads(data)['metadata'])
     assert metadata['/file.txt']['size'] == 4
 
 
