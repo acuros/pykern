@@ -139,13 +139,9 @@ class FileSystemCommands(object):
         self.filesystem = filesystem
 
 
-def is_relative_path(path):
-    return not path.startswith('/')
-
-
 def _calculate_absolute(current_dir, path):
-    if not is_relative_path(path):
-        return path
+    if path.startswith('/'):
+        current_dir = '/'
 
     current_dentries = [dentry for dentry in current_dir.split('/') if dentry]
     dentries_to_apply = path.split('/')
