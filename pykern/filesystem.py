@@ -55,7 +55,7 @@ class FileSystem(object):
             raise TypeError('Disk fd is omitted')
         self.disk = disk
         self.superblocks = self._load_superblocks()
-        self.current_dir = '/'
+        self.current_directory = '/'
         self.opened_files = dict()
 
     def _load_superblocks(self):
@@ -118,7 +118,7 @@ class FileSystem(object):
         self.superblocks[absolute_name] = dict(size=size, mode=mode)
 
     def get_absolute_of(self, path):
-        return _calculate_absolute(self.current_dir, path)
+        return _calculate_absolute(self.current_directory, path)
 
     def _move_fs_cursor_to(self, filename):
         start_pos = 1024*1024

@@ -29,14 +29,14 @@ def mkdir(dirname):
 
 
 def getcwd():
-    return FileSystem().current_dir
+    return FileSystem().current_directory
 
 
 def chdir(path):
     fs = FileSystem()
     absolute_path = fs.get_absolute_of('%s' % path)
     fs.get_dentry(absolute_path, mode=fs.DIRECTORY_MODE)
-    fs.current_dir = absolute_path
+    fs.current_directory = absolute_path
 
 
 def listdir(path):
