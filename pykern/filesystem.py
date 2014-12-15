@@ -90,7 +90,7 @@ class FileSystem(object):
         return self.disk.read(self.superblocks[filename]['size'])
 
     def close_file(self, vfile):
-        mode = self.opened_files.pop(vfile.filename)
+        mode = self.opened_files.pop(vfile.name)
         if mode == 'r':
             return
         elif mode == 'w':
@@ -115,7 +115,14 @@ class FileSystem(object):
 
     def add_superblock(self, name, mode=0, size=0):
         absolute_name = self.get_absolute_of(name)
-        self.superblocks[absolute_name] = dict(size=size, mode=mode)
+        if self.superblocks.keys():
+            last_superblock = self.superblocks[self.superblocks.keys()[-1]]
+            offset = last_superblock['offset'] + last_superblock['size']
+        else:
+            offset = 0
+        self.superblocks[absolute_name] = dict(
+            size=size, mode=mode, offset=offset
+        )
 
     def get_absolute_of(self, path):
         return _calculate_absolute(self.current_directory, path)

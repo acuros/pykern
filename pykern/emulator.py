@@ -67,7 +67,9 @@ class Emulator(object):
         with open(disk_file_name, 'w') as disk:
             disk.write('\x00'*1024*1024)
             disk.seek(0)
-            disk.write(bson.dumps(dict(superblocks=[('/', dict(size=0, mode=stat.S_IFDIR))])))
+            disk.write(bson.dumps(dict(superblocks=[('/', dict(
+                size=0, mode=stat.S_IFDIR, offset=0
+            ))])))
 
     def put_file(self, src, dst='/', fs_file_name=None):
         with open(src, 'rb') as rf:
