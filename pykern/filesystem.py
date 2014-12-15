@@ -102,6 +102,17 @@ class FileSystem(object):
             self.save_superblocks()
         self.disk.flush()
 
+    def get_dentry(self, name, mode=None):
+        dentry = self.superblocks.get(self.get_absolute_of(name))
+        if dentry and (mode is None or dentry['mode'] == mode):
+            return dentry
+        elif dentry and mode == self.DIRECTORY_MODE:
+            raise OSError("Not a directory: '%s'" % name)
+        elif dentry and mode == self.FILE_MODE:
+            raise OSError("Is a directory: '%s'" % name)
+        elif not dentry:
+            raise OSError("No such file or directory: '%s'" % name)
+
     def add_superblock(self, name, mode=0, size=0):
         absolute_name = self.get_absolute_of(name)
         self.superblocks[absolute_name] = dict(size=size, mode=mode)

@@ -35,8 +35,7 @@ def getcwd():
 def chdir(path):
     fs = FileSystem()
     absolute_path = fs.get_absolute_of('%s' % path)
-    if not os.path.isdir(absolute_path):
-        raise OSError('Not a directory: "%s"' % path)
+    fs.get_dentry(absolute_path, mode=fs.DIRECTORY_MODE)
     fs.current_dir = absolute_path
 
 
@@ -60,9 +59,5 @@ def listdir(path):
 def stat(path):
     fs = FileSystem()
     path = fs.get_absolute_of(path)
-    try:
-        file_ = fs.superblocks[path]
-    except KeyError:
-        raise OSError('No such file "%s"' % path)
-
-    return stat_result(file_['mode'], file_['size'])
+    superblock = fs.get_dentry(path)
+    return stat_result(superblock['mode'], superblock['size'])
