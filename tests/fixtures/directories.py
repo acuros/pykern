@@ -12,3 +12,12 @@ print 'Directory listdir passed'
 assert os.path.isdir('test_dir')
 assert not os.path.isdir('NewFile')
 print 'isdir passed'
+
+os.rmdir('test_dir')
+
+try:
+    os.rmdir('NewFile')
+except OSError:
+    pass
+else:
+    raise AssertionError('Can remove not a directory')

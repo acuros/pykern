@@ -35,7 +35,7 @@ def getcwd():
 def chdir(path):
     fs = FileSystem()
     absolute_path = fs.get_absolute_of('%s' % path)
-    fs.get_dentry(absolute_path, mode=fs.DIRECTORY_MODE)
+    fs.get_superblock(absolute_path, mode=fs.DIRECTORY_MODE)
     fs.current_directory = absolute_path
 
 
@@ -56,8 +56,16 @@ def listdir(path):
     return result
 
 
+def remove(path):
+    FileSystem().remove_file(path)
+
+
+def rmdir(path):
+    FileSystem().remove_directory(path)
+
+
 def stat(path):
     fs = FileSystem()
     path = fs.get_absolute_of(path)
-    superblock = fs.get_dentry(path)
+    superblock = fs.get_superblock(path)
     return stat_result(superblock['mode'], superblock['size'])

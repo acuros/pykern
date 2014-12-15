@@ -86,7 +86,7 @@ class FileSystem(object):
             raise NotImplementedError
 
     def read_file(self, filename):
-        dentry = self.get_dentry(filename, mode=self.FILE_MODE)
+        dentry = self.get_superblock(filename, mode=self.FILE_MODE)
         self.disk.seek(1024*1024 + dentry['offset'])
         return self.disk.read(self.superblocks[filename]['size'])
 
@@ -103,7 +103,18 @@ class FileSystem(object):
             self.save_superblocks()
         self.disk.flush()
 
-    def get_dentry(self, name, mode=None):
+    def remove_file(self, filename):
+        self._remove_dentry(filename, self.FILE_MODE)
+
+    def remove_directory(self, filename):
+        self._remove_dentry(filename, self.DIRECTORY_MODE)
+
+    def _remove_dentry(self, filename, mode):
+        dentry_name = self.get_absolute_of(filename)
+        self.get_superblock(dentry_name, mode=mode)
+        self.superblocks.pop(dentry_name)
+
+    def get_superblock(self, name, mode=None):
         dentry = self.superblocks.get(self.get_absolute_of(name))
         if dentry and (mode is None or dentry['mode'] == mode):
             return dentry
