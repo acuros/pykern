@@ -86,7 +86,8 @@ class FileSystem(object):
             raise NotImplementedError
 
     def read_file(self, filename):
-        self._move_fs_cursor_to(filename)
+        dentry = self.get_dentry(filename, mode=self.FILE_MODE)
+        self.disk.seek(1024*1024 + dentry['offset'])
         return self.disk.read(self.superblocks[filename]['size'])
 
     def close_file(self, vfile):
@@ -126,14 +127,6 @@ class FileSystem(object):
 
     def get_absolute_of(self, path):
         return _calculate_absolute(self.current_directory, path)
-
-    def _move_fs_cursor_to(self, filename):
-        start_pos = 1024*1024
-        for filename_, superblock in self.superblocks.items():
-            if filename_ == filename:
-                break
-            start_pos += superblock['size']
-        self.disk.seek(start_pos)
 
     def save_superblocks(self):
         self.disk.seek(0)
