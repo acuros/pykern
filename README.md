@@ -1,8 +1,7 @@
 pykern
 ======
 
-Just For Fun. Virtual kernel in python
-Still sharing many functions from host, getting separated.
+Just For Fun. Virtual kernel in python. Still sharing many functions from host, getting separated. The concept is emulator provides python instead of machine language
 
 ```sh
 acuros@AcurosDevMachine ~/Documents/pykern (master)$ python manage.py install -f
