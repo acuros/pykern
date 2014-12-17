@@ -1,8 +1,6 @@
 import sys
 
 from filesystem import FileSystem
-from pykern.libs import patch_libs
-from pykern.shell import Shell
 
 
 class Kernel(object):
@@ -10,6 +8,7 @@ class Kernel(object):
         self.filesystem = FileSystem(disk)
 
     def boot(self):
+        from pykern.shell import Shell
         Shell(self).run()
 
     def run_file(self, filename, args):

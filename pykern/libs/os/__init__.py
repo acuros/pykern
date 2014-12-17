@@ -1,6 +1,11 @@
 from pykern.filesystem import FileSystem
 
-import os
+__all__ = ['stat_result', 'mkdir', 'getcwd', 'chdir', 'listdir', 'remove', 'rmdir', 'stat', 'path']
+
+from . import path
+
+import sys
+sys.modules['os.path'] = path
 
 
 class stat_result(object):
@@ -32,40 +37,40 @@ def getcwd():
     return FileSystem().current_directory
 
 
-def chdir(path):
+def chdir(p):
     fs = FileSystem()
-    absolute_path = fs.get_absolute_of('%s' % path)
+    absolute_path = fs.get_absolute_of('%s' % p)
     fs.get_superblock(absolute_path, mode=fs.DIRECTORY_MODE)
     fs.current_directory = absolute_path
 
 
-def listdir(path):
+def listdir(p):
     fs = FileSystem()
-    if not os.path.isdir(path):
-        raise OSError('Not a directory: "%s"' % path)
-    absolute_target_path = fs.get_absolute_of('%s' % path)
+    if not path.isdir(p):
+        raise OSError('Not a directory: "%s"' % p)
+    absolute_target_path = fs.get_absolute_of('%s' % p)
     if not absolute_target_path.endswith('/'):
         absolute_target_path += '/'
     result = [
-        path[len(absolute_target_path):]
-        for path in FileSystem().superblocks
-        if path.startswith(absolute_target_path) and
-        '/' not in path.split(absolute_target_path, 1)[1] and
-        path != absolute_target_path
+        p[len(absolute_target_path):]
+        for p in FileSystem().superblocks
+        if p.startswith(absolute_target_path) and
+        '/' not in p.split(absolute_target_path, 1)[1] and
+        p != absolute_target_path
     ]
     return result
 
 
-def remove(path):
-    FileSystem().remove_file(path)
+def remove(p):
+    FileSystem().remove_file(p)
 
 
-def rmdir(path):
-    FileSystem().remove_directory(path)
+def rmdir(p):
+    FileSystem().remove_directory(p)
 
 
-def stat(path):
+def stat(p):
     fs = FileSystem()
-    path = fs.get_absolute_of(path)
-    superblock = fs.get_superblock(path)
+    p = fs.get_absolute_of(p)
+    superblock = fs.get_superblock(p)
     return stat_result(superblock['mode'], superblock['size'])

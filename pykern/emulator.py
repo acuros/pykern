@@ -87,7 +87,7 @@ class Emulator(object):
 
     def _copy_original_modules(self):
         import libs
-        original_module_names = [name.split('pykern_')[1] for name in libs.__all__]
+        original_module_names = libs.__all__
         original_modules = dict()
         for module_name in original_module_names:
             original_modules[module_name] = dict(
