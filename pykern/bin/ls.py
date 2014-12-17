@@ -22,7 +22,7 @@ def get_filenames():
 if args.l:
     fs = FileSystem()
     filenames = get_filenames()
-    filepaths = [fs.get_absolute_of(os.path.join(args.directory, name)) for name in filenames]
+    filepaths = [os.path.abspath(os.path.join(args.directory, name)) for name in filenames]
     stats = [(name, os.stat(path)) for name, path in zip(filenames, filepaths)]
     max_size = max([stat.st_size for _, stat in stats])
     if max_size == 0:

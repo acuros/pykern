@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import bson
 
-from pykern.filesystem import FileSystem, _calculate_absolute
+from pykern.filesystem import FileSystem
 from tests.utils import run_file_in_kernel
 
 
@@ -18,6 +18,7 @@ def test_filesystem_file_write():
     assert data[1024*1024:] == '1234'
 
     superblocks = OrderedDict(bson.loads(data)['superblocks'])
+    print superblocks
     assert superblocks['/file.txt']['size'] == 4
 
 
@@ -27,12 +28,3 @@ def test_file_write():
 
 def test_directories():
     assert run_file_in_kernel('directories.py')
-
-
-def test_relative_path():
-    assert _calculate_absolute('/', '.') == '/'
-    assert _calculate_absolute('/', 'foo') == '/foo'
-    assert _calculate_absolute('/', 'foo/bar') == '/foo/bar'
-    assert _calculate_absolute('/foo/bar', '..') == '/foo'
-    assert _calculate_absolute('/foo/bar/', '../foo') == '/foo/foo'
-    assert _calculate_absolute('/', '../../../') == '/'

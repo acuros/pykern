@@ -57,13 +57,15 @@ class FileSystem(object):
         self.superblocks = self._load_superblocks()
         self.current_directory = '/'
         self.opened_files = dict()
+        global abspath
+        from os.path import abspath
 
     def _load_superblocks(self):
         raw_data = self.disk.read(1024*1024)
         return OrderedDict(bson.loads(raw_data)['superblocks'])
 
     def open_file(self, filename, mode='r'):
-        filename = self.get_absolute_of(filename)
+        filename = abspath(filename)
         if mode.startswith('r'):
             fp = self._open_file_for_read(filename)
         elif mode.startswith('w'):
@@ -110,12 +112,12 @@ class FileSystem(object):
         self._remove_dentry(filename, self.DIRECTORY_MODE)
 
     def _remove_dentry(self, filename, mode):
-        dentry_name = self.get_absolute_of(filename)
+        dentry_name = abspath(filename)
         self.get_superblock(dentry_name, mode=mode)
         self.superblocks.pop(dentry_name)
 
     def get_superblock(self, name, mode=None):
-        dentry = self.superblocks.get(self.get_absolute_of(name))
+        dentry = self.superblocks.get(abspath(name))
         if dentry and (mode is None or dentry['mode'] == mode):
             return dentry
         elif dentry and mode == self.DIRECTORY_MODE:
@@ -126,7 +128,7 @@ class FileSystem(object):
             raise OSError("No such file or directory: '%s'" % name)
 
     def add_superblock(self, name, mode=0, size=0):
-        absolute_name = self.get_absolute_of(name)
+        absolute_name = abspath(name)
         if self.superblocks.keys():
             last_superblock = self.superblocks[self.superblocks.keys()[-1]]
             offset = last_superblock['offset'] + last_superblock['size']
@@ -136,9 +138,6 @@ class FileSystem(object):
             size=size, mode=mode, offset=offset
         )
 
-    def get_absolute_of(self, path):
-        return _calculate_absolute(self.current_directory, path)
-
     def save_superblocks(self):
         self.disk.seek(0)
         self.disk.write(bson.dumps(dict(superblocks=self.superblocks.items())))
@@ -146,21 +145,3 @@ class FileSystem(object):
     def patch_all(self):
         import __builtin__
         __builtin__.open = __builtin__.file = self.open_file
-
-
-def _calculate_absolute(current_dir, path):
-    if path.startswith('/'):
-        current_dir = '/'
-
-    current_dentries = [dentry for dentry in current_dir.split('/') if dentry]
-    dentries_to_apply = path.split('/')
-    while dentries_to_apply:
-        next_dentry = dentries_to_apply.pop(0)
-        if next_dentry in ('', '.'):
-            continue
-        elif next_dentry == '..':
-            if len(current_dentries) > 0:
-                current_dentries.pop()
-        else:
-            current_dentries.append(next_dentry)
-    return '/%s' % '/'.join(current_dentries)
