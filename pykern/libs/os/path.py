@@ -1,5 +1,5 @@
 from pykern.filesystem import FileSystem
-import defaults as os
+import base as os
 
 __all__ = ['normcase', 'isdir', 'join', 'isabs', 'normpath', 'abspath']
 

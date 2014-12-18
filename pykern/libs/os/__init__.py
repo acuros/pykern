@@ -1,8 +1,8 @@
-from . import defaults, path
+from . import base, path
 
 __all__ = ['path']
-__all__.extend(list(defaults.__all__))
-from defaults import *
+__all__.extend(list(base.__all__))
+from base import *
 
 import sys
 sys.modules['os.path'] = path
